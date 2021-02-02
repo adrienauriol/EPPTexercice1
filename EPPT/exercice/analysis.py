@@ -58,40 +58,47 @@ for entry in range(1, tree.GetEntries()):
     else : 
         print("Too less z hits. Reject event #", entry)
 
-event = 1 #For test purpose, will loop on that later 
+save = False
 
-#Function for fitting
 def linear(x,a,b):
     return a*x+b
 
-#Position of the wires wrt the center of the magnet
 zPosDC1 = np.array([-6.25, -5.75, -5.25, -4.75, -4.25])
 zPosDC2 = np.array([2.25, 2.75, 3.25, 3.75, 4.25])
 
-#Fit with a straight line 
-popt1,pcov1 = optimize.curve_fit(linear,zPosDC1,dc1_xpos[event])
+#Set x values to the good units
+dc1_xpos_metres=dc1_xpos/1000
+dc2_xpos_metres=dc2_xpos/1000
+
+
+popt1,pcov1 = optimize.curve_fit(linear,zPosDC1,dc1_xpos_metres[event])
 z1=np.linspace(-6.25,0)
 x1=linear(x=z1,a=popt1[0],b=popt1[1])
 
-#Same for hits in DC2 
-popt2,pcov2 = optimize.curve_fit(linear,zPosDC2,dc2_xpos[event])
-z2=np.linspace(0,4.25)
+popt2,pcov2 = optimize.curve_fit(linear,zPosDC2,dc2_xpos_metres[event])
+z2=np.linspace(-0.5,4.25)
 x2=linear(x=z2,a=popt2[0],b=popt2[1])
 
-#Quick plot for event display
-fig = plt.figure(figsize=(15,10))
-plt.scatter(zPosDC1,dc1_xpos[event],label='DC1')
-plt.scatter(zPosDC2, dc2_xpos[event] , label='DC2')
 
-plt.plot(z1,x1)
-plt.plot(z2,x2)
+#PLOT
+fig = plt.figure(figsize=(8,8))
 
-square=plt.Rectangle((-0.5,-0.5),1,1,fill=False)
+axes= fig.add_axes([0.1,0.1,0.8,0.8])
+
+axes.scatter(zPosDC1,dc1_xpos_metres[event],label='DC1')
+axes.scatter(zPosDC2, dc2_xpos_metres[event] , label='DC2')
+axes.plot(z1,x1)
+axes.plot(z2,x2)
+axes.set_ylim(-1.5E-2,1E-3)
+
+square=plt.Rectangle((-1,-1),2,2,fill=False)
 plt.gca().add_patch(square)
 
 plt.legend()
 
 plt.grid()
-plt.show()
+if save : plt.savefig("event"+str(event)+".png")
+    
+plt.title("Event #"+str(event))
 
-plt.savefig("event"+event+".png")
+plt.show()
