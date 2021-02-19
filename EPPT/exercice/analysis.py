@@ -8,9 +8,15 @@ import sys
 if str(sys.argv[2]) == "momentumMode":
     momentumMode = True
     calorimetryMode = False
+    calorimetryModeCorrection = False
 elif str(sys.argv[2]) == "calorimetryMode":
     momentumMode = False
     calorimetryMode = True
+    calorimetryModeCorrection = False
+elif str(sys.argv[2]) == "calorimetryModeCorrection":
+    momentumMode = False
+    calorimetryMode = False
+    calorimetryModeCorrection = True
 #Booleans to monitor 
 debug = False
 
@@ -230,5 +236,73 @@ if calorimetryMode :
 
     plt.savefig('fig/TotalEnergyDeposit_'+case+'.png')
     plt.close()
+
+if calorimetryModeCorrection :
+    
+    def ECcorrection(E):
+        epsilon = 0.61 / (54 + 1.24)
+        depth = 0.3 / 1.86
+        tmax = np.log(E/epsilon) - 0.5
+        t95 = tmax + 0.08*54 + 9.6
+        epsilon_corr = (t95/tmax)*epsilon
+        return epsilon_corr * ( 1 - np.exp(t95) ) / ( 1 - np.exp(depth) )
+
+    ECEnergy = []
+    for entry in range(0, tree.GetEntries()):
+        tree.GetEntry(entry)
+        if (np.array( getattr(tree, 'ECEnergy')) /1000 > 0): #Just to be sure there isn't any negative values
+            ECcorr = (ECcorrection(np.array( getattr(tree, 'ECEnergy')) /1000))/100000
+            ECEnergy.append((( np.array( getattr(tree, 'ECEnergy')) /1000 ) + ECcorr)/100)
+        
+    HCEnergy = []
+    for entry in range(0, tree.GetEntries()):
+        tree.GetEntry(entry)
+        if (np.array( getattr(tree, 'HCEnergy')) /1000 > 0):
+            HCEnergy.append( np.array( getattr(tree, 'HCEnergy')) /1000 )
+
+    TotalEnergy = ECEnergy + HCEnergy
+
+
+
+    #ECAL deposit plot 
+    fig = plt.figure(figsize=(8,8))
+
+    y, x, _ = plt.hist(ECEnergy,bins=100,range=(min(ECEnergy),max(ECEnergy)),density=False)
+
+    plt.xlabel('ECAL energy deposit [GeV]',fontsize=25)
+    plt.ylabel('$N_{events}$',fontsize=25)
+    plt.xticks(fontsize=15) 
+    plt.yticks(fontsize=15)
+
+    plt.savefig('fig/ECALDeposit_'+case+'_ECALcorr.png')
+    plt.close()
+
+    #HCAL deposit plot (basicaly the same code)
+    fig = plt.figure(figsize=(8,8))
+
+    y, x, _ = plt.hist(HCEnergy,bins=100,range=(min(HCEnergy),max(HCEnergy)),density=False)
+
+    plt.xlabel('HCAL energy deposit [GeV]',fontsize=25)
+    plt.ylabel('$N_{events}$',fontsize=25)
+    plt.xticks(fontsize=15) 
+    plt.yticks(fontsize=15);
+
+    plt.savefig('fig/HCALDeposit_'+case+'_ECALcorr.png')
+    plt.close()
+
+    #Total energy deposit
+    fig = plt.figure(figsize=(8,8))
+
+    y, x, _ = plt.hist(TotalEnergy,bins=100,range=(min(TotalEnergy),max(TotalEnergy)),density=False)
+
+    plt.xlabel('Total energy deposit [GeV]',fontsize=25)
+    plt.ylabel('$N_{events}$',fontsize=25)
+    plt.xticks(fontsize=15) 
+    plt.yticks(fontsize=15);
+
+    plt.savefig('fig/TotalEnergyDeposit_'+case+'_ECALcorr.png')
+    plt.close()
+
+
 
 print("End of execution \n")
