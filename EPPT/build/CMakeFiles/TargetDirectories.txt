@@ -1,8 +1,0 @@
-/home/aa/EPPT/build/CMakeFiles/install/strip.dir
-/home/aa/EPPT/build/CMakeFiles/install/local.dir
-/home/aa/EPPT/build/CMakeFiles/exampleB5.dir
-/home/aa/EPPT/build/CMakeFiles/rebuild_cache.dir
-/home/aa/EPPT/build/CMakeFiles/B5.dir
-/home/aa/EPPT/build/CMakeFiles/edit_cache.dir
-/home/aa/EPPT/build/CMakeFiles/list_install_components.dir
-/home/aa/EPPT/build/CMakeFiles/install.dir
