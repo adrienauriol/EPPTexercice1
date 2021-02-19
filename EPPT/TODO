@@ -1,0 +1,6 @@
+create a run of 1000 muons 
+pass throught the detector 
+obtain distribution (momentum distribution for ex)
+
+/gun/particle mu+
+

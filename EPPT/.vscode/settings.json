@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "fooPlot_newntuple.C": "cpp",
+        "analysis.C": "cpp",
+        "Reader.C": "cpp"
+    }
+}
